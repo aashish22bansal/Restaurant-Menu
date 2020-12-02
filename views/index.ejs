@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 </head>
 
-<body style="">
+<body>
     <center>
         <div class="vert_cen">
             <div class="container">
@@ -103,6 +103,8 @@
 
                                         var span = document.getElementsByClassName("close")[0];
 
+                                        var user_name = document.getElementsByName("uname");
+                                        var password = document.getElementsByName("psw");
                                         btn.onclick = function() {
                                             popup.style.display = "block";
                                         }
@@ -118,7 +120,20 @@
                                         }
 
                                         create.onclick = function() {
-                                            //add to data
+                                            var http = require('http');
+                                            var fetch = require('node-fetch');
+                                            fetch('http://localhost:3000/student', {
+                                                    method: 'POST',
+                                                    body: JSON.stringify({
+                                                        "user-name": user_name,
+                                                        "pswd": password
+                                                    }),
+                                                    headers: {
+                                                        'Content-Type': 'application/json'
+                                                    },
+                                                })
+                                                .then(res => console.log(res));
+
                                         }
                                     </script>
                                 </td>
@@ -130,15 +145,30 @@
                                 </td>
                             </tr>
                         </form>
-                        <!--
-                            <tr>
-                                <td><img src="f1.jpg" alt=""></td>
-                            </tr>-->
                     </tbody>
                 </table>
             </div>
         </div>
     </center>
+    <script>
+        var login = document.getElementById("login");
+
+        login.onclick = function() {
+            var http = require('http');
+            var fetch = require('node-fetch');
+            fetch('http://localhost:3000/student', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        "username": "ajith",
+                        "password": "ajith"
+                    }),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                })
+                .then(res => console.log(res));
+        }
+    </script>
     <style>
         .bottom {
             position: fixed;
