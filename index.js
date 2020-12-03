@@ -1,18 +1,18 @@
-const express = require("express");
-const bodyParser = require("body-parser");
-const path = require("path");
+var express = require("express");
+var bodyParser = require("body-parser");
+var path = require("path");
 var mongodb = require('mongodb');
-const { debugPort } = require("process");
-const app = express();
+var { debugPort } = require("process");
+var app = express();
 
 mongoose = require("mongoose");
 //mongoose.connect(mongoConnectionString, {useNewUrlParser: true, useUnifiedTopology: true});
-mongoose.connect("mongodb://localhost:27017/ajith", { useUnifiedTopology: true, useNewUrlParser: true, }).then(() => console.log('DB Connected!')).catch(err => {     console.log("DB Connection Error: ${err.message}"); });
+mongoose.connect("mongodb://localhost:27017/ajith", { useUnifiedTopology: true, useNewUrlParser: true, }).then(() => console.log('DB Connected!')).catch(err => { console.log("DB Connection Error: ${err.message}"); });
 
 var dbConn = mongodb.MongoClient.connect('mongodb://localhost:27017'); // CREATTING CONNECTION
 
 //mongoose.connect("mongodb://localhost:27017/ajith", {useNewUrlParser: true}); // CONNECTED TO DATABASE
-var MongoClient=require('mongodb').MongoClient;
+var MongoClient = require('mongodb').MongoClient;
 
 var url = "mongodb://localhost:27017/ajith";
 
@@ -30,20 +30,19 @@ app.get("/", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-    //const { name, password } = req.body;
+    //var { name, password } = req.body;
     credentials = {
-        username : req.body.username,
-        password : req.body.password
+        username: req.body.username,
+        password: req.body.password
     };
     var pass = false;
-    MongoClient.connect(url, function(err,db){
-        if(err)
-        {
+    MongoClient.connect(url, function(err, db) {
+        if (err) {
             throw err;
         }
         var dbo = db.db("ajith");
-        dbo.collection('users').find().toArray(function(err,result){
-            if(err){
+        dbo.collection('users').find().toArray(function(err, result) {
+            if (err) {
                 throw err;
             }
             console.log(result);
@@ -60,19 +59,17 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/signup", (req, res) => {
-    response = 
-    {
-        fname	: req.body.fname,
-        uname	: req.body.uname,
-        psw	: req.body.psw
+    response = {
+        fname: req.body.fname,
+        uname: req.body.uname,
+        psw: req.body.psw
     };
     console.log(response);
-    MongoClient.connect(url,function(err,db){
-        if(err)
-        {
+    MongoClient.connect(url, function(err, db) {
+        if (err) {
             throw err;
         }
-        var dbo=db.db("ajith");
+        var dbo = db.db("ajith");
         /*
         dbo.createCollection("users",function(err,res){
             if(err){
@@ -82,8 +79,8 @@ app.post("/signup", (req, res) => {
             db.close();
         });
         */
-        dbo.collection("users").insertOne(response,function(err,res){
-            if(err){
+        dbo.collection("users").insertOne(response, function(err, res) {
+            if (err) {
                 throw err;
             }
             console.log("User Data Inserted");

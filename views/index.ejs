@@ -51,8 +51,8 @@
                                 </td>
                                 <td>
                                     <button type="submit" id="sign_up" name="sign_up">Sign Up</button>
-                                    
-                                    
+
+
                                 </td>
                             </tr>
                             <tr>
@@ -111,9 +111,8 @@
         </div>
     </center>
     <script>
-                                        
         var popup = document.getElementById("pop");
-        
+
         var btn = document.getElementById("sign_up");
         /*
         var create = document.getElementById("create_account");
@@ -126,7 +125,7 @@
         btn.onclick = function() {
             popup.style.display = "block";
         }
-        
+
         span.onclick = function() {
             popup.style.display = "none";
         }
@@ -138,51 +137,54 @@
         }
 
         /*create.onclick = function() {*/
-            var express = require("express");
-            var path = require('path');
-            var bodyParser = require('body-parser');
-            var mongodb = require('mongodb');
-            mongoose = require("mongoose");
+        var express = require("express");
+        var path = require('path');
+        var bodyParser = require('body-parser');
+        var mongodb = require('mongodb');
+        mongoose = require("mongoose");
 
-            var dbConn = mongodb.MongoClient.connect('mongodb://localhost:27017'); // CREATTING CONNECTION
+        var dbConn = mongodb.MongoClient.connect('mongodb://localhost:27017'); // CREATTING CONNECTION
 
-            mongoose.connect("mongodb://localhost:27017/ajith", {useNewUrlParser: true}); // CONNECTED TO DATABASE
+        mongoose.connect("mongodb://localhost:27017/ajith", {
+            useNewUrlParser: true
+        }); // CONNECTED TO DATABASE
 
-            var app = express();
+        var app = express();
 
-            var MongoClient=require('mongodb').MongoClient;
+        var MongoClient = require('mongodb').MongoClient;
 
-            var url = "mongodb://localhost:27017/ajith";
+        var url = "mongodb://localhost:27017/ajith";
 
-            app.use(bodyParser.json());
-            app.use(bodyParser.urlencoded({ extended: true }));
-            app.use(express.static(path.resolve(__dirname, 'public')));
+        app.use(bodyParser.json());
+        app.use(bodyParser.urlencoded({
+            extended: true
+        }));
+        app.use(express.static(path.resolve(__dirname, 'public')));
 
-            app.post("/signup", (req, res) => {
-            response = 
-            {
-                fname	: req.body.fname,
-                uname	: req.body.uname,
-                psw	: req.body.psw
+
+        app.post("/signup", (req, res) => {
+            response = {
+                fname: req.body.fname,
+                uname: req.body.uname,
+                psw: req.body.psw
             };
             console.log(response);
-            MongoClient.connect(url,function(err,db){
-                if(err)
-                {
+            MongoClient.connect(url, function(err, db) {
+                if (err) {
                     throw err;
                 }
-                var dbo=db.db("ajith");
-                
-                dbo.createCollection("users",function(err,res){
-                    if(err){
+                var dbo = db.db("ajith");
+
+                dbo.createCollection("users", function(err, res) {
+                    if (err) {
                         throw err;
                     }
                     console.log("Users Collection created!");
                     db.close();
                 });
-                
-                dbo.collection("users").insertOne(response,function(err,res){
-                    if(err){
+
+                dbo.collection("users").insertOne(response, function(err, res) {
+                    if (err) {
                         throw err;
                     }
                     console.log("User Data Inserted");
@@ -191,40 +193,21 @@
                 db.close();
             });
         });
-            /*
-            var http = require('http');
-            var fetch = require('node-fetch');
-            fetch('http://localhost:3000/student', {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        "user-name": user_name,
-                        "pswd": password
-                    }),
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                })
-                .then(res => console.log(res));*/
+        /*
+        var http = require('http');
+        var fetch = require('node-fetch');
+        fetch('http://localhost:3000/student', {
+                method: 'POST',
+                body: JSON.stringify({
+                    "user-name": user_name,
+                    "pswd": password
+                }),
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+            .then(res => console.log(res));*/
         /*}*/
-    </script>
-    <script>
-        var login = document.getElementById("login");
-
-        login.onclick = function() {
-            var http = require('http');
-            var fetch = require('node-fetch');
-            fetch('http://localhost:3000/student', {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        "username": "ajith",
-                        "password": "ajith"
-                    }),
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                })
-                .then(res => console.log(res));
-        }
     </script>
     <style>
         .bottom {
