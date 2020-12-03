@@ -24,6 +24,9 @@ app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname, "public")));
 
 
+function go_to_webpage(){
+    
+}
 
 app.get("/", (req, res) => {
     res.render("index");
@@ -31,31 +34,40 @@ app.get("/", (req, res) => {
 
 app.post("/login", (req, res) => {
     //var { name, password } = req.body;
+    var pass = false;
     credentials = {
         username: req.body.username,
         password: req.body.password
     };
+    console.log(credentials);
     var pass = false;
     MongoClient.connect(url, function(err, db) {
         if (err) {
             throw err;
         }
         var dbo = db.db("ajith");
-        dbo.collection('users').find().toArray(function(err, result) {
+        var query = {
+            uname: req.body.username,
+            psw: req.body.password
+        }
+        dbo.collection('users').find(query).toArray(function(err, res) {
             if (err) {
                 throw err;
             }
-            console.log(result);
-            res.render("success");
-            db.close();
+            console.log(res);
         });
+        pass = true;
+        console.log(pass);
+        db.close();
+        if (Boolean(pass)) {
+            //res.render("success");
+            console.log("\nInside condition for rendering!\n");
+            res.render("success");
+        } else {
+            console.log("\nInside the else part\n");
+            res.render("failure");
+        }
     });
-
-    if (pass) {
-        res.render("success");
-    } else {
-        res.render("failure");
-    }
 });
 
 app.post("/signup", (req, res) => {
@@ -83,6 +95,7 @@ app.post("/signup", (req, res) => {
             if (err) {
                 throw err;
             }
+            
             console.log("User Data Inserted");
         });
         res.render("index");
@@ -92,6 +105,6 @@ app.post("/signup", (req, res) => {
 
 //new Promise(() => { throw new Error('exception!'); });
 
-app.listen(3000, () => {
-    console.log("server started on port 3000");
+app.listen(4000, () => {
+    console.log("server started on port 4000");
 });
