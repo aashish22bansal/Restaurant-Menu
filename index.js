@@ -5,10 +5,11 @@ var mongodb = require('mongodb');
 var { debugPort } = require("process");
 var app = express();
 var async = require("async");
+const { checkServerIdentity } = require("tls");
 
 mongoose = require("mongoose");
 //mongoose.connect(mongoConnectionString, {useNewUrlParser: true, useUnifiedTopology: true});
-mongoose.connect("mongodb://localhost:27017/ajith", { useUnifiedTopology: true, useNewUrlParser: true, }).then(() => console.log('DB Connected!')).catch(err => { console.log("DB Connection Error: ${err.message}"); });
+mongoose.connect("mongodb://localhost:27017/ajith", { useUnifiedTopology: true, useNewUrlParser: true }).then(() => console.log('DB Connected!')).catch(err => { console.log("DB Connection Error: ${err.message}"); });
 
 var dbConn = mongodb.MongoClient.connect('mongodb://localhost:27017'); // CREATTING CONNECTION
 
@@ -27,13 +28,14 @@ app.use(express.static(path.join(__dirname, "public")));
 app.get("/", (req, res) => {
     res.render("index");
 });
-var pass;
+var pass=false;
+
 app.post("/login", function(req, res) {
     credentials = {
         username: req.body.username,
         password: req.body.password
     };
-    console.log(credentials);
+    console.log("Printing the credentials[Console Output 1]: ",credentials);
 
     MongoClient.connect(url, function(err, db) {
         var dbo = db.db("ajith");
@@ -41,63 +43,98 @@ app.post("/login", function(req, res) {
             uname: req.body.username,
             psw: req.body.password
         }
+        /*
         async.series([
-
-                function(callback) {
-                    dbo.collection('users').find(query).toArray(function(err, res) {
-                        if (err) {
-                            throw err;
-                        }
-                        console.log(res);
-                        if (res) {
-                            pass = true;
-                        } else {
-                            pass = false;
-                        }
-                    });
-                    db.close();
-                    callback();
-                },
-
-                /*function(callback) {
-                    console.log(pass);
-                    if (Boolean(pass)) {
-                        console.log("\nInside condition for rendering!\n");
-                        res.render("success");
-                        pass = false;
+            function One(callback){
+                callback(null, 'RESULT OF FUNCTION ONE');
+                console.log("Printing PASS[CONSOLE OUTPUT 2]: ", pass);
+                if (Boolean(pass)) {
+                    //pass = false;
+                    console.log("\nInside condition for rendering!\n");
+                    res.render("success");
+                } else {
+                    //pass = false;
+                    console.log("\nInside the else part\n");
+                    res.render("failure");
+                }
+            },
+            function Two(callback) {
+                callback(null, 'RESULT OF FUNCTION TWO');
+                dbo.collection('users').find(query).toArray(function(err, res) {
+                    if (err) {
+                        throw err;
+                    }
+                    console.log("Printing RES[CONSOLE OUTPUT 3]: ",res);
+                    if (res) {
+                        console.log("Inside FUNCTION TWO IF CONDITION. SETTING PASS AS 'TRUE'");
+                        pass = true;
                     } else {
-                        console.log("\nInside the else part\n");
-                        res.render("failure");
+                        console.log("Inside FUNCTION TWO ELSE CONDITION. SETTING PASS AS 'FALSE'");
                         pass = false;
                     }
-                    db.close();
-                    callback();
-                }*/
-            ]
-            /*, function(err, result) {
-                        console.log(Boolean(result));
-                        if (Boolean(result)) {
-                            pass = false;
-                            console.log("\nInside condition for rendering!\n");
-                            res.render("success");
-                        } else {
-                            pass = false;
-                            console.log("\nInside the else part\n");
-                            res.render("failure");
-                        }
-                    }*/
-        );
-
+                });
+                console.log("Printing PASS[CONSOLE OUTPUT 4]: ",pass);
+                db.close();
+                console.log("Printing PASS[CONSOLE OUTPUT 5]: ",pass);
+                callback();
+            }
+        ], function(err, result){
+            if(err){
+                throw err;
+            }
+            console.log("Printing RESULT[CONSOLE OUTPUT 6]: ",result);
+        });
+        */
+        async.waterfall([
+            function One(callback){
+                some_func({}, function(err,res){
+                    if(err){
+                        callback(err, null);
+                        return;
+                    }
+                    console.log("Printing PASS[CONSOLE OUTPUT 2]: ", pass);
+                    if (Boolean(pass)) {
+                        //pass = false;
+                        console.log("\nInside condition for rendering!\n");
+                        res.render("success");
+                    } else {
+                        //pass = false;
+                        console.log("\nInside the else part\n");
+                        res.render("failure");
+                    }
+                    //var something = res.items[0].avatar_url;
+                    callback(null, pass); /*(null, something)*/
+                });
+            },
+            function Two(pass, callback){
+                var something2_0 = pass;
+                dbo.collection('users').find(query).toArray(function(err, res) {
+                    if (err) {
+                        throw err;
+                    }
+                    console.log("Printing RES[CONSOLE OUTPUT 3]: ",res);
+                    if (res) {
+                        console.log("Inside FUNCTION TWO IF CONDITION. SETTING PASS AS 'TRUE'");
+                        pass = true;
+                    } else {
+                        console.log("Inside FUNCTION TWO ELSE CONDITION. SETTING PASS AS 'FALSE'");
+                        pass = false;
+                    }
+                });
+                console.log("Printing PASS[CONSOLE OUTPUT 4]: ",pass);
+                db.close();
+                console.log("Printing PASS[CONSOLE OUTPUT 5]: ",pass);
+                callback(null, something2_0);
+            }
+        ], function(err,result){
+            if(err){
+                throw err;
+            }
+            console.log("Printing RESULT[CONSOLE OUTPUT 6]: ",result);
+        })
+            console.log("Printing PASS[CONSOLE OUTPUT 7]: ",pass);
     });
-    if (Boolean(pass)) {
-        pass = false;
-        console.log("\nInside condition for rendering!\n");
-        res.render("success");
-    } else {
-        pass = false;
-        console.log("\nInside the else part\n");
-        res.render("failure");
-    }
+    
     //pass = false;
 });
 app.post("/signup", (req, res) => {
