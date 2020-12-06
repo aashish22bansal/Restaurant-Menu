@@ -4,6 +4,7 @@ var path = require("path");
 var mongodb = require('mongodb');
 var { debugPort } = require("process");
 var app = express();
+var async = require("async");
 
 mongoose = require("mongoose");
 //mongoose.connect(mongoConnectionString, {useNewUrlParser: true, useUnifiedTopology: true});
@@ -23,53 +24,82 @@ app.use(express.static(path.resolve(__dirname, 'public')));
 app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname, "public")));
 
-
-function go_to_webpage(){
-    
-}
-
 app.get("/", (req, res) => {
     res.render("index");
 });
-
-app.post("/login", (req, res) => {
-    //var { name, password } = req.body;
-    var pass = false;
+var pass;
+app.post("/login", function(req, res) {
     credentials = {
         username: req.body.username,
         password: req.body.password
     };
     console.log(credentials);
-    var pass = false;
+
     MongoClient.connect(url, function(err, db) {
-        if (err) {
-            throw err;
-        }
         var dbo = db.db("ajith");
         var query = {
             uname: req.body.username,
             psw: req.body.password
         }
-        dbo.collection('users').find(query).toArray(function(err, res) {
-            if (err) {
-                throw err;
-            }
-            console.log(res);
-        });
-        pass = true;
-        console.log(pass);
-        db.close();
-        if (Boolean(pass)) {
-            //res.render("success");
-            console.log("\nInside condition for rendering!\n");
-            res.render("success");
-        } else {
-            console.log("\nInside the else part\n");
-            res.render("failure");
-        }
-    });
-});
+        async.series([
 
+                function(callback) {
+                    dbo.collection('users').find(query).toArray(function(err, res) {
+                        if (err) {
+                            throw err;
+                        }
+                        console.log(res);
+                        if (res) {
+                            pass = true;
+                        } else {
+                            pass = false;
+                        }
+                    });
+                    db.close();
+                    callback();
+                },
+
+                /*function(callback) {
+                    console.log(pass);
+                    if (Boolean(pass)) {
+                        console.log("\nInside condition for rendering!\n");
+                        res.render("success");
+                        pass = false;
+                    } else {
+                        console.log("\nInside the else part\n");
+                        res.render("failure");
+                        pass = false;
+                    }
+                    db.close();
+                    callback();
+                }*/
+            ]
+            /*, function(err, result) {
+                        console.log(Boolean(result));
+                        if (Boolean(result)) {
+                            pass = false;
+                            console.log("\nInside condition for rendering!\n");
+                            res.render("success");
+                        } else {
+                            pass = false;
+                            console.log("\nInside the else part\n");
+                            res.render("failure");
+                        }
+                    }*/
+        );
+
+    });
+    if (Boolean(pass)) {
+        pass = false;
+        console.log("\nInside condition for rendering!\n");
+        res.render("success");
+    } else {
+        pass = false;
+        console.log("\nInside the else part\n");
+        res.render("failure");
+    }
+    //pass = false;
+});
 app.post("/signup", (req, res) => {
     response = {
         fname: req.body.fname,
@@ -82,28 +112,17 @@ app.post("/signup", (req, res) => {
             throw err;
         }
         var dbo = db.db("ajith");
-        /*
-        dbo.createCollection("users",function(err,res){
-            if(err){
-                throw err;
-            }
-            console.log("Users Collection created!");
-            db.close();
-        });
-        */
         dbo.collection("users").insertOne(response, function(err, res) {
             if (err) {
                 throw err;
             }
-            
+
             console.log("User Data Inserted");
         });
         res.render("index");
         db.close();
     });
 });
-
-//new Promise(() => { throw new Error('exception!'); });
 
 app.listen(4000, () => {
     console.log("server started on port 4000");
