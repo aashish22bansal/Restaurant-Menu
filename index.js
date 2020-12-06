@@ -1,22 +1,31 @@
+// REQUIRED PACKAGES
 var express = require("express");
 var bodyParser = require("body-parser");
 var path = require("path");
 var mongodb = require('mongodb');
-var { debugPort } = require("process");
+var mongoose = require("mongoose");
 var app = express();
 var async = require("async");
+
+var { debugPort } = require("process");
 const { checkServerIdentity } = require("tls");
 
-mongoose = require("mongoose");
+// REQUIRED VARIABLES
+var pass=false;
+var url = "mongodb://localhost:27017/ajith";
+
 //mongoose.connect(mongoConnectionString, {useNewUrlParser: true, useUnifiedTopology: true});
-mongoose.connect("mongodb://localhost:27017/ajith", { useUnifiedTopology: true, useNewUrlParser: true }).then(() => console.log('DB Connected!')).catch(err => { console.log("DB Connection Error: ${err.message}"); });
+mongoose.Promise = global.Promise;
+mongoose.connect("mongodb://localhost:27017/ajith", { 
+    useUnifiedTopology: true, 
+    useNewUrlParser: true 
+}).then(() => console.log('DB Connected!')).catch(err => { 
+    console.log("DB Connection Error: ${err.message}");
+});
 
 var dbConn = mongodb.MongoClient.connect('mongodb://localhost:27017'); // CREATTING CONNECTION
-
-//mongoose.connect("mongodb://localhost:27017/ajith", {useNewUrlParser: true}); // CONNECTED TO DATABASE
 var MongoClient = require('mongodb').MongoClient;
 
-var url = "mongodb://localhost:27017/ajith";
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -28,7 +37,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.get("/", (req, res) => {
     res.render("index");
 });
-var pass=false;
+
 
 app.post("/login", function(req, res) {
     credentials = {
@@ -43,7 +52,7 @@ app.post("/login", function(req, res) {
             uname: req.body.username,
             psw: req.body.password
         }
-        /*
+        
         async.series([
             function One(callback){
                 callback(null, 'RESULT OF FUNCTION ONE');
@@ -84,10 +93,17 @@ app.post("/login", function(req, res) {
             }
             console.log("Printing RESULT[CONSOLE OUTPUT 6]: ",result);
         });
-        */
+        /*
         async.waterfall([
             function One(callback){
-                some_func({}, function(err,res){
+                some_func({
+                    function(err){
+                        if(err){
+                            throw err;
+                        }
+                        console.log("Inside some function");
+                    }
+                }, function(err,res){
                     if(err){
                         callback(err, null);
                         return;
@@ -131,10 +147,9 @@ app.post("/login", function(req, res) {
                 throw err;
             }
             console.log("Printing RESULT[CONSOLE OUTPUT 6]: ",result);
-        })
-            console.log("Printing PASS[CONSOLE OUTPUT 7]: ",pass);
+        });*/
+        console.log("Printing PASS[CONSOLE OUTPUT 7]: ",pass);
     });
-    
     //pass = false;
 });
 app.post("/signup", (req, res) => {
